@@ -1,0 +1,99 @@
+version: '3.9'
+
+services:
+  # ──────────────────────────────────────────────────────────────────────
+  # PostgreSQL
+  # ──────────────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: taskflow-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: taskflow
+      POSTGRES_PASSWORD: taskflow_pass
+      POSTGRES_DB: taskflow_db
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U taskflow -d taskflow_db']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ──────────────────────────────────────────────────────────────────────
+  # Redis
+  # ──────────────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: taskflow-redis
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # ──────────────────────────────────────────────────────────────────────
+  # API
+  # ──────────────────────────────────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: api
+    container_name: taskflow-api
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://taskflow:taskflow_pass@postgres:5432/taskflow_db
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-taskflow-access-secret-key-change-in-prod}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-taskflow-refresh-secret-key-change-in-prod}
+      JWT_ACCESS_EXPIRES_IN: 15m
+      JWT_REFRESH_EXPIRES_IN: 7d
+      AUTH_RATE_LIMIT_WINDOW_MS: 60000
+      AUTH_RATE_LIMIT_MAX: 10
+      EMAIL_FROM: noreply@taskflow.dev
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # ──────────────────────────────────────────────────────────────────────
+  # Worker
+  # ──────────────────────────────────────────────────────────────────────
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: worker
+    container_name: taskflow-worker
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://taskflow:taskflow_pass@postgres:5432/taskflow_db
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-taskflow-access-secret-key-change-in-prod}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-taskflow-refresh-secret-key-change-in-prod}
+      JWT_ACCESS_EXPIRES_IN: 15m
+      JWT_REFRESH_EXPIRES_IN: 7d
+      AUTH_RATE_LIMIT_WINDOW_MS: 60000
+      AUTH_RATE_LIMIT_MAX: 10
+      EMAIL_FROM: noreply@taskflow.dev
+
+volumes:
+  postgres_data:
+  redis_data:
