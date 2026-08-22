@@ -63,7 +63,8 @@ services:
       JWT_REFRESH_EXPIRES_IN: 7d
       AUTH_RATE_LIMIT_WINDOW_MS: 60000
       AUTH_RATE_LIMIT_MAX: 10
-      EMAIL_FROM: noreply@taskflow.dev
+      EMAIL_FROM: ${EMAIL_FROM:-onboarding@resend.dev}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
     depends_on:
       postgres:
         condition: service_healthy
@@ -82,17 +83,18 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: production
-      PORT: 3000
       DATABASE_URL: postgresql://taskflow:taskflow_pass@postgres:5432/taskflow_db
       REDIS_HOST: redis
       REDIS_PORT: 6379
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-taskflow-access-secret-key-change-in-prod}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-taskflow-refresh-secret-key-change-in-prod}
-      JWT_ACCESS_EXPIRES_IN: 15m
-      JWT_REFRESH_EXPIRES_IN: 7d
-      AUTH_RATE_LIMIT_WINDOW_MS: 60000
-      AUTH_RATE_LIMIT_MAX: 10
-      EMAIL_FROM: noreply@taskflow.dev
+      EMAIL_FROM: ${EMAIL_FROM:-onboarding@resend.dev}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
 volumes:
   postgres_data:

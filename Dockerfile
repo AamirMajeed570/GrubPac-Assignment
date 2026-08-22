@@ -17,6 +17,7 @@ RUN npm ci
 COPY tsconfig.json ./
 COPY src ./src
 COPY worker ./worker
+COPY docs ./docs
 RUN npx prisma generate
 RUN npm run build
 
@@ -31,6 +32,7 @@ RUN apk add --no-cache openssl
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/docs ./docs
 COPY package*.json ./
 
 # Run migrations then start the API

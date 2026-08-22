@@ -44,7 +44,8 @@ export const env = {
   },
 
   email: {
-    from: optionalEnv('EMAIL_FROM', 'noreply@taskflow.dev'),
+    from: optionalEnv('EMAIL_FROM', 'onboarding@resend.dev'),
+    resendApiKey: process.env['RESEND_API_KEY'], // optional — falls back to mock if not set
   },
 
   isProduction: process.env['NODE_ENV'] === 'production',

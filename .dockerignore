@@ -8,5 +8,4 @@ coverage
 .git
 .gitignore
 README.md
-docs/
 tests/

@@ -69,7 +69,7 @@
             "url": "{{baseUrl}}/auth/register",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Demo Admin\",\n  \"email\": \"demo@taskflow.dev\",\n  \"password\": \"Password123!\",\n  \"organizationId\": \"{{organizationId}}\"\n}"
+              "raw": "{\n  \"name\": \"Demo Admin\",\n  \"email\": \"aamirmajeedkhan570@gmail.com\",\n  \"password\": \"Password123!\",\n  \"organizationId\": \"{{organizationId}}\"\n}"
             }
           }
         },
