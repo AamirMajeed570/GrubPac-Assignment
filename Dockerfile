@@ -35,7 +35,8 @@ COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/docs ./docs
 COPY package*.json ./
 
-# Run migrations then start the API
+# CMD is overridden by railway.toml startCommand in production.
+# Kept here as fallback for local docker run.
 CMD ["sh", "-c", "npx prisma migrate deploy && node dist/src/server.js"]
 
 # ─── Worker runtime ───────────────────────────────────────────────────────────
