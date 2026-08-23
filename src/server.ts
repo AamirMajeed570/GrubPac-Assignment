@@ -6,11 +6,17 @@ import { closeQueues } from './queue/queues';
 import { logger } from './utils/logger';
 
 async function main(): Promise<void> {
+  logger.info(`Starting TaskFlow API... [NODE_ENV=${env.nodeEnv}, PORT=${env.port}]`);
+
   // Connect to PostgreSQL
+  logger.info('Connecting to database...');
   await connectDatabase();
   logger.info('Database connected');
 
+  logger.info('Creating Express app...');
   const app = createApp();
+
+  logger.info(`Starting HTTP server on port ${env.port}...`);
   const server = app.listen(env.port, () => {
     logger.info(`TaskFlow API running on port ${env.port} [${env.nodeEnv}]`);
   });
@@ -53,5 +59,8 @@ async function main(): Promise<void> {
 
 main().catch((err) => {
   console.error('Fatal startup error:', err);
+  console.error('Stack:', err?.stack);
+  console.error('Code:', err?.code);
+  console.error('Message:', err?.message);
   process.exit(1);
 });
