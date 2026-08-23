@@ -8,6 +8,19 @@ import { logger } from './utils/logger';
 async function main(): Promise<void> {
   logger.info(`Starting TaskFlow API... [NODE_ENV=${env.nodeEnv}, PORT=${env.port}]`);
 
+  // Debug: list /app contents to verify Docker copy
+  try {
+    const fs = await import('fs');
+    logger.info('Contents of /app: ' + fs.readdirSync('/app').join(', '));
+    if (fs.existsSync('/app/docs')) {
+      logger.info('Contents of /app/docs: ' + fs.readdirSync('/app/docs').join(', '));
+    } else {
+      logger.warn('/app/docs directory does NOT exist');
+    }
+  } catch (e) {
+    logger.warn('Could not list /app directory');
+  }
+
   // Connect to PostgreSQL
   logger.info('Connecting to database...');
   await connectDatabase();
