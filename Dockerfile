@@ -32,7 +32,7 @@ RUN apk add --no-cache openssl
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/docs ./docs
+COPY docs ./docs
 COPY package*.json ./
 
 # CMD is overridden by railway.toml startCommand in production.
