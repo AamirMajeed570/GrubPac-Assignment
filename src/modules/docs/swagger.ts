@@ -7,23 +7,26 @@ import path from 'path';
 /**
  * Resolve the openapi.yaml path in both dev and Docker production.
  *
- * Dev:        __dirname = .../src/modules/docs      → ../../../docs/openapi.yaml
- * Production: __dirname = .../dist/src/modules/docs → ../../../../docs/openapi.yaml
+ * Dev:        process.cwd() = project root  → docs/openapi.yaml
+ * Production: process.cwd() = /app          → /app/docs/openapi.yaml
  *
- * We try both and fall back to process.cwd()/docs/openapi.yaml as a last resort.
+ * We also try __dirname-relative paths as fallback.
  */
 function resolveSpecPath(): string | null {
   const candidates = [
+    // Primary: relative to working directory (works in Docker where cwd = /app)
+    path.resolve(process.cwd(), 'docs/openapi.yaml'),
     // Works in dev (ts-node: __dirname = src/modules/docs)
     path.resolve(__dirname, '../../../docs/openapi.yaml'),
     // Works in production (compiled: __dirname = dist/src/modules/docs)
     path.resolve(__dirname, '../../../../docs/openapi.yaml'),
-    // Fallback: relative to working directory (works in Docker where cwd = /app)
-    path.resolve(process.cwd(), 'docs/openapi.yaml'),
   ];
 
+  console.log('Searching for OpenAPI spec in:');
   for (const candidate of candidates) {
-    if (fs.existsSync(candidate)) return candidate;
+    const exists = fs.existsSync(candidate);
+    console.log(`  ${exists ? '✓' : '✗'} ${candidate}`);
+    if (exists) return candidate;
   }
   return null;
 }
@@ -33,10 +36,6 @@ export function setupSwagger(app: Application): void {
 
   if (!yamlPath) {
     console.warn('OpenAPI spec not found — Swagger UI will not be available');
-    console.warn('Searched paths:');
-    console.warn('  ', path.resolve(__dirname, '../../../docs/openapi.yaml'));
-    console.warn('  ', path.resolve(__dirname, '../../../../docs/openapi.yaml'));
-    console.warn('  ', path.resolve(process.cwd(), 'docs/openapi.yaml'));
     return;
   }
 
