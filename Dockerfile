@@ -33,6 +33,8 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
 COPY docs ./docs
+# Also place openapi.yaml where the compiled swagger module expects it
+RUN mkdir -p dist/src/modules/docs && cp docs/openapi.yaml dist/src/modules/docs/openapi.yaml
 COPY package*.json ./
 
 # CMD is overridden by railway.toml startCommand in production.

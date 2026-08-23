@@ -14,11 +14,13 @@ import path from 'path';
  */
 function resolveSpecPath(): string | null {
   const candidates = [
+    // Production: compiled into dist alongside the swagger module
+    path.resolve(__dirname, 'openapi.yaml'),
     // Primary: relative to working directory (works in Docker where cwd = /app)
     path.resolve(process.cwd(), 'docs/openapi.yaml'),
-    // Works in dev (ts-node: __dirname = src/modules/docs)
+    // Dev (ts-node: __dirname = src/modules/docs)
     path.resolve(__dirname, '../../../docs/openapi.yaml'),
-    // Works in production (compiled: __dirname = dist/src/modules/docs)
+    // Production fallback (__dirname = dist/src/modules/docs)
     path.resolve(__dirname, '../../../../docs/openapi.yaml'),
   ];
 
