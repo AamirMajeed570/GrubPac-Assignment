@@ -6,7 +6,6 @@ export const QUEUE_NAMES = {
   EMAIL_DLQ: 'email-notifications-dlq',
 } as const;
 
-// Lazily initialized queues
 let emailQueue: Queue | null = null;
 let emailDlq: Queue | null = null;
 
@@ -16,12 +15,9 @@ export function getEmailQueue(): Queue {
       connection: createRedisConnection(),
       defaultJobOptions: {
         attempts: 3,
-        backoff: {
-          type: 'exponential',
-          delay: 1000, // 1s → 2s → 4s
-        },
+        backoff: { type: 'exponential', delay: 1000 },
         removeOnComplete: { count: 100 },
-        removeOnFail: false, // keep failed jobs for DLQ move
+        removeOnFail: false,
       },
     });
   }
@@ -38,12 +34,6 @@ export function getEmailDlq(): Queue {
 }
 
 export async function closeQueues(): Promise<void> {
-  if (emailQueue) {
-    await emailQueue.close();
-    emailQueue = null;
-  }
-  if (emailDlq) {
-    await emailDlq.close();
-    emailDlq = null;
-  }
+  if (emailQueue) { await emailQueue.close(); emailQueue = null; }
+  if (emailDlq) { await emailDlq.close(); emailDlq = null; }
 }

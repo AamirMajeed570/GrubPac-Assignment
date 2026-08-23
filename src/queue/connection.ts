@@ -4,18 +4,13 @@ import { logger } from '../utils/logger';
 
 let redisClient: IORedis | null = null;
 
-/**
- * Returns a singleton IORedis connection.
- * BullMQ requires a dedicated connection per Queue/Worker instance.
- * This client is used for health checks and general Redis operations.
- */
 export function getRedisClient(): IORedis {
   if (!redisClient) {
     redisClient = new IORedis({
       host: env.redis.host,
       port: env.redis.port,
       password: env.redis.password,
-      maxRetriesPerRequest: null, // required by BullMQ
+      maxRetriesPerRequest: null,
       enableReadyCheck: false,
     });
 
@@ -25,9 +20,6 @@ export function getRedisClient(): IORedis {
   return redisClient;
 }
 
-/**
- * Returns a fresh IORedis connection (BullMQ needs its own connections).
- */
 export function createRedisConnection(): IORedis {
   return new IORedis({
     host: env.redis.host,

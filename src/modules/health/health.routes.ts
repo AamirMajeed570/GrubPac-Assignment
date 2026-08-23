@@ -5,18 +5,9 @@ import { logger } from '../../utils/logger';
 
 const router = Router();
 
-/**
- * GET /health
- * Returns liveness + readiness info (DB and Redis connectivity).
- */
 router.get('/', async (_req: Request, res: Response) => {
-  const health: Record<string, string> = {
-    status: 'ok',
-    database: 'unknown',
-    redis: 'unknown',
-  };
+  const health: Record<string, string> = { status: 'ok', database: 'unknown', redis: 'unknown' };
 
-  // Check PostgreSQL
   try {
     await prisma.$queryRaw`SELECT 1`;
     health['database'] = 'connected';
@@ -26,7 +17,6 @@ router.get('/', async (_req: Request, res: Response) => {
     health['status'] = 'degraded';
   }
 
-  // Check Redis
   try {
     const redis = getRedisClient();
     await redis.ping();
@@ -37,8 +27,7 @@ router.get('/', async (_req: Request, res: Response) => {
     health['status'] = 'degraded';
   }
 
-  const statusCode = health['status'] === 'ok' ? 200 : 503;
-  res.status(statusCode).json(health);
+  res.status(health['status'] === 'ok' ? 200 : 503).json(health);
 });
 
 export default router;

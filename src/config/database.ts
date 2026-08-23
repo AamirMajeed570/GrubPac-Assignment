@@ -1,10 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { env } from './env';
 
-// Singleton Prisma client — reuse across the application
-const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined;
-};
+const globalForPrisma = globalThis as unknown as { prisma: PrismaClient | undefined };
 
 export const prisma =
   globalForPrisma.prisma ??
@@ -12,7 +9,6 @@ export const prisma =
     log: env.isDevelopment ? ['query', 'error', 'warn'] : ['error'],
   });
 
-// In development, preserve the client across hot-reloads
 if (env.isDevelopment) {
   globalForPrisma.prisma = prisma;
 }

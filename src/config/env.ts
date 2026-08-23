@@ -1,14 +1,11 @@
 import dotenv from 'dotenv';
 import path from 'path';
 
-// Load .env from project root
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 function requireEnv(key: string): string {
   const value = process.env[key];
-  if (!value) {
-    throw new Error(`Missing required environment variable: ${key}`);
-  }
+  if (!value) throw new Error(`Missing required environment variable: ${key}`);
   return value;
 }
 
@@ -45,7 +42,7 @@ export const env = {
 
   email: {
     from: optionalEnv('EMAIL_FROM', 'onboarding@resend.dev'),
-    resendApiKey: process.env['RESEND_API_KEY'], // optional — falls back to mock if not set
+    resendApiKey: process.env['RESEND_API_KEY'],
   },
 
   isProduction: process.env['NODE_ENV'] === 'production',

@@ -1,6 +1,3 @@
-/**
- * Email job payload — sent to the BullMQ email queue.
- */
 export interface EmailJobPayload {
   type: 'TASK_ASSIGNED';
   to: string;

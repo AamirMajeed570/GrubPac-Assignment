@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from 'express';
 import { verifyAccessToken, AccessTokenPayload } from '../utils/jwt';
 import { unauthorized } from '../utils/errors';
 
-// Extend Express Request to carry auth context
 declare global {
   namespace Express {
     interface Request {
@@ -18,12 +17,6 @@ export interface AuthUser {
   email: string;
 }
 
-/**
- * Middleware that validates the Bearer access token.
- * On success, attaches `req.user` with userId, orgId, role, email.
- * The orgId comes from the JWT (which was set at login from DB membership),
- * so the client cannot tamper with it.
- */
 export function requireAuth(req: Request, _res: Response, next: NextFunction): void {
   try {
     const authHeader = req.headers.authorization;

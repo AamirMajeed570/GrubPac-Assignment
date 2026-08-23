@@ -1,11 +1,3 @@
-/**
- * Seed script — creates realistic demo data:
- *   2 organizations, 5 users, multiple projects, 10+ tasks,
- *   assignments, and sample comments.
- *
- * Run with: npm run prisma:seed
- */
-
 import { PrismaClient, TaskStatus, TaskPriority, OrgRole } from '@prisma/client';
 import bcrypt from 'bcrypt';
 
